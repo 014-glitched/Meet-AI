@@ -18,9 +18,9 @@ import {useForm} from "react-hook-form";
 import {Alert, AlertTitle} from "@/src/components/ui/alert";
 import Link from "next/link";
 import { authClient } from "@/src/lib/auth-client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Peddana } from "next/font/google";
+import { useRouter } from "next/navigation";
+import { FaGoogle, FaGithub } from "react-icons/fa"  
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -57,11 +57,34 @@ export const SignUpView = () => {
         name: data.name,
         email: data.email,
         password: data.password,
+
+        callbackURL: '/'
       },
       {
         onSuccess: () => {
           setPending(false)
           router.push("/")
+        },
+        onError: ({ error}) => {
+          setPending(false)
+          setError(error.message)
+        }
+      }
+    )
+  }
+
+  const onSocial = (provider: "google" | "github") => {
+    setError(null)
+    setPending(true)
+
+    authClient.signIn.social(
+      {
+        provider: provider,
+        callbackURL: "/"
+      },
+      {
+        onSuccess: () => {
+          setPending(false)
         },
         onError: ({ error}) => {
           setPending(false)
@@ -167,7 +190,7 @@ export const SignUpView = () => {
                     <AlertTitle>{error}</AlertTitle>
                   </Alert>
                 )}
-                <Button disabled={pending} type="submit" className="w-full">Sign In</Button>
+                <Button disabled={pending} type="submit" className="w-full">Sign Up</Button>
                 <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                     <span className="bg-card text-muted-foreground relative z-10 px-2">
                         Or continue with
@@ -176,19 +199,21 @@ export const SignUpView = () => {
                 <div className="grid grid-cols-2 gap-4">
                     <Button 
                       disabled={pending}
+                      onClick={() => onSocial('google')}
                       variant="outline" 
                       type="button"
-                      className="w-full"
+                      className="w-full cursor-pointer"
                     >
-                      Google
+                      <FaGoogle />
                     </Button>
                     <Button 
                       disabled={pending}
+                      onClick={() => onSocial('github')}
                       variant="outline"    
                       type="button"
-                      className="w-full"
+                      className="w-full cursor-pointer"
                     >
-                      Github
+                      <FaGithub />
                     </Button>
                 </div>
                 <div className="text-center text:sm">
@@ -211,7 +236,7 @@ export const SignUpView = () => {
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-                By clicking conitnue, you agree to our <a href="#">Terms of service</a> and <a href="#">Privacy Policy</a>
+        By clicking conitnue, you agree to our <a href="#">Terms of service</a> and <a href="#">Privacy Policy</a>
       </div>
     </div>
   );

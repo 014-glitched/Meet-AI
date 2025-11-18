@@ -20,7 +20,7 @@ import Link from "next/link";
 import { authClient } from "@/src/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Peddana } from "next/font/google";
+import { FaGoogle, FaGithub } from "react-icons/fa"
 
 const formSchema = z.object({
   email: z.email({message: "Invalid email address"}),
@@ -47,12 +47,35 @@ export const SignInView = () => {
     authClient.signIn.email(
       {
         email: data.email,
-        password: data.password
+        password: data.password,
+
+        callbackURL: "/"
       },
       {
         onSuccess: () => {
           setPending(false)
-          router.push("/")
+          router.push('/')
+        },
+        onError: ({ error}) => {
+          setPending(false)
+          setError(error.message)
+        }
+      }
+    )
+  }
+
+    const onSocial = (provider: "google" | "github") => {
+    setError(null)
+    setPending(true)
+
+    authClient.signIn.social(
+      {
+        provider: provider,
+        callbackURL: "/"
+      },
+      {
+        onSuccess: () => {
+          setPending(false)
         },
         onError: ({ error}) => {
           setPending(false)
@@ -128,19 +151,21 @@ export const SignInView = () => {
                 <div className="grid grid-cols-2 gap-4">
                     <Button 
                       disabled={pending}
+                      onClick={() => onSocial('google')}
                       variant="outline" 
                       type="button"
-                      className="w-full"
+                      className="w-full cursor-pointer"
                     >
-                      Google
+                      <FaGoogle />
                     </Button>
                     <Button 
                       disabled={pending}
+                      onClick={() => onSocial('github')}
                       variant="outline"    
                       type="button"
-                      className="w-full"
+                      className="w-full cursor-pointer"
                     >
-                      Github
+                      <FaGithub />
                     </Button>
                 </div>
                 <div className="text-center text:sm">
