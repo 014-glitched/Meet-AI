@@ -1,6 +1,6 @@
+import { auth } from "@/src/lib/auth";
+import { HomeView } from "@/src/modules/home/ui/views/home-view";
 import { headers } from "next/headers"
-import { auth } from "../lib/auth"
-import { HomeView } from "../modules/home/ui/views/home-view"
 import { redirect } from "next/navigation";
 
 const Page = async () => {
